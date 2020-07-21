@@ -1,7 +1,8 @@
 import { expect } from 'chai';
 import Q from 'q';
 import 'mocha';
-import ThrottledWorkerPool, { ThrottledFunction, ThrottledWorker } from './';
+import ThrottledWorkerPool, { ThrottledFunction } from './';
+import sleep from '../sleep';
 
 describe('ThrottledWorkerPool', () => {
     it('should run', async () => {
@@ -13,7 +14,7 @@ describe('ThrottledWorkerPool', () => {
         p.add('1');
         p.add('1');
         p.start(2);
-        await new Promise(resolve => setTimeout(() => resolve(), 210));
+        await sleep(210);
         expect(counter).eq(3);
     });
 
@@ -41,7 +42,7 @@ describe('ThrottledWorkerPool', () => {
         p.add('2');
         p.add('3');
         p.start(2);
-        await new Promise(resolve => setTimeout(() => resolve(), 210));
+        await sleep(210);
         expect(counter).eq(3);
         expect(errors).to.include.members(['1', '2', '3']);
     });
@@ -53,8 +54,7 @@ describe('ThrottledWorkerPool', () => {
             const d = Q.defer<void>();
             return {
                 work(task: string): Promise<void> {
-                    const t = new Promise(resolve => setTimeout(() => resolve(), 100));
-                    return Promise.race([d.promise, t]) as any;
+                    return Promise.race([d.promise, sleep(100)]) as any;
                 },
                 cancel() {
                     counter++;
@@ -66,7 +66,7 @@ describe('ThrottledWorkerPool', () => {
         p.add('2');
         p.add('3');
         p.start(2);
-        await new Promise(resolve => setTimeout(() => resolve(), 10));
+        await sleep(10);
         await p.stop();
         expect(counter).eq(2);
         expect(Date.now() - start).lte(20);

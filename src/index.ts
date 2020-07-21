@@ -5,3 +5,5 @@ export * as defer from './defer';
 export { default as Condition } from './Condition';
 export { default as Mutex } from './Mutex';
 export { default as RWMutex } from './RWMutex';
+export { default as Once } from './Once';
+export { default as sleep } from './sleep';

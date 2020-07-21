@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import 'mocha';
 import Condition from './';
 
+
 describe('Condition', () => {
     it('should signal', async () => {
         const c = new Condition<string>();

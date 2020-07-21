@@ -134,3 +134,10 @@ can only obtain the lock if no other lock/rlock called
 can simultaneously obtain multiple read lock 
 
 ### RWMutex.rUnlock(): void
+
+## sleep(ms: number): Promise<void>
+
+## Once
+
+### Once.do<T>(f: () => T): Promise<T>
+only one function will be executed at once, all other `do` calls will be discarded before the first one is returned.
