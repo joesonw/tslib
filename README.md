@@ -2,6 +2,10 @@
 ![npm](https://img.shields.io/npm/v/@joesonw/tslib/latest)
 ![coverage](https://img.shields.io/coveralls/github/joesonw/tslib)
 
+# Install
+
+`npm i @joesonw/tslib`
+
 
 # Library
 
@@ -38,7 +42,7 @@ interface Worker<T> {
 }
 ```
 
-### ThrottledFunction
+### ThrottledFunction\<T\>
 helper function to build simple worker
 
 ```
