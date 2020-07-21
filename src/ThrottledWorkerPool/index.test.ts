@@ -1,16 +1,14 @@
 import { expect } from 'chai';
+import Q from 'q';
 import 'mocha';
-import ThrottledWorkerPool from './';
+import ThrottledWorkerPool, { ThrottledFunction, ThrottledWorker } from './';
 
 describe('ThrottledWorkerPool', () => {
     it('should run', async () => {
         let counter = 0;
-        const worker = {
-            work(task: string): Promise<void> {
-                return new Promise(resolve => setTimeout(() => { counter++; resolve(); }, 100));
-            },
-        };
-        const p = new ThrottledWorkerPool(worker);
+        const p = new ThrottledWorkerPool(ThrottledFunction((task: string): Promise<void> => {
+            return new Promise(resolve => setTimeout(() => { counter++; resolve(); }, 100));
+        }));
         p.add('1');
         p.add('1');
         p.add('1');
@@ -21,12 +19,9 @@ describe('ThrottledWorkerPool', () => {
 
     it('should stop', async () => {
         let counter = 0;
-        const worker = {
-            work(task: string): Promise<void> {
-                return new Promise(resolve => setTimeout(() => { counter++; resolve(); }, 100));
-            },
-        };
-        const p = new ThrottledWorkerPool(worker);
+        const p = new ThrottledWorkerPool(ThrottledFunction((task: string): Promise<void> => {
+            return new Promise(resolve => setTimeout(() => { counter++; resolve(); }, 100));
+        }));
         p.add('1');
         p.add('1');
         p.add('1');
@@ -39,12 +34,9 @@ describe('ThrottledWorkerPool', () => {
     it('should catch error', async () => {
         let counter = 0;
         const errors: string[] = [];
-        const worker = {
-            work(task: string): Promise<void> {
-                return new Promise((_, reject) => setTimeout(() => { counter++; reject(new Error(task)); }, 100));
-            },
-        };
-        const p = new ThrottledWorkerPool(worker, err => errors.push(err.message));
+        const p = new ThrottledWorkerPool(ThrottledFunction((task: string): Promise<void> => {
+            return new Promise((_, reject) => setTimeout(() => { counter++; reject(new Error(task)); }, 100));
+        }), err => errors.push(err.message));
         p.add('1');
         p.add('2');
         p.add('3');
@@ -52,5 +44,31 @@ describe('ThrottledWorkerPool', () => {
         await new Promise(resolve => setTimeout(() => resolve(), 210));
         expect(counter).eq(3);
         expect(errors).to.include.members(['1', '2', '3']);
+    });
+
+    it('should cancel', async () => {
+        let counter = 0;
+        const start = Date.now();
+        const p = new ThrottledWorkerPool(() => {
+            const d = Q.defer<void>();
+            return {
+                work(task: string): Promise<void> {
+                    const t = new Promise(resolve => setTimeout(() => resolve(), 100));
+                    return Promise.race([d.promise, t]) as any;
+                },
+                cancel() {
+                    counter++;
+                    d.resolve();
+                },
+            };
+        });
+        p.add('1');
+        p.add('2');
+        p.add('3');
+        p.start(2);
+        await new Promise(resolve => setTimeout(() => resolve(), 10));
+        await p.stop();
+        expect(counter).eq(2);
+        expect(Date.now() - start).lte(20);
     });
 });

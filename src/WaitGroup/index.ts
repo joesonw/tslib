@@ -11,9 +11,9 @@ export default class WaitGroup {
         return this.mCount;
     }
 
-    wait(): PromiseLike<void> {
+    wait(): Q.Promise<void> {
         if (this.mCount === 0) {
-            return Promise.resolve();
+            return Q.resolve();
         }
         return this.defer.promise;
     }

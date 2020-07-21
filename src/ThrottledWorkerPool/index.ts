@@ -2,8 +2,13 @@ import Queue from '../Queue';
 import WaitGroup from '../WaitGroup';
 
 
-export interface Worker<T> {
+export interface ThrottledWorker<T> {
     work(task: T): Promise<void>;
+    cancel?(): void;
+}
+
+export function ThrottledFunction<T>(work: (task: T) => Promise<void>): (id: number) => ThrottledWorker<T> {
+    return () => ({ work });
 }
 
 export default class ThrottledWorkerPool<T> {
@@ -11,9 +16,10 @@ export default class ThrottledWorkerPool<T> {
     private queue = new Queue<T>();
     private running: boolean;
     private wg: WaitGroup;
+    private workers: ThrottledWorker<T>[] = [];
 
     constructor(
-        private worker: Worker<T>,
+        private newWorker: (id: number) => ThrottledWorker<T>,
         private onError?: (err: Error) => void,
     ) {
     }
@@ -25,26 +31,32 @@ export default class ThrottledWorkerPool<T> {
     async stop(): Promise<void> {
         if (!this.running) return;
         this.running = false;
+        for (const worker of this.workers) {
+            worker.cancel?.();
+        }
         await this.wg.wait();
     }
 
     start(concurrency: number): void {
         if (this.running) return;
+        this.workers = [];
         this.running = true;
         this.concurrency = concurrency;
         this.wg = new WaitGroup(concurrency);
         for (let i = 0; i < concurrency; i++) {
-            this.spawn();
+            const worker = this.newWorker(i);
+            this.workers.push(worker);
+            this.work(worker);
         }
     }
 
-    private spawn() {
+    private work(worker: ThrottledWorker<T>) {
         if (!this.running) {
             this.wg.done();
             return;
         }
         this.queue.get()
-            .then(task => this.worker.work(task))
+            .then(task => worker.work(task))
             .catch(err => {
                 if (this.onError) {
                     this.onError(err);
@@ -52,6 +64,6 @@ export default class ThrottledWorkerPool<T> {
                     throw err;
                 }
             })
-            .finally(() => this.spawn());
+            .finally(() => this.work(worker));
     }
 }

@@ -13,12 +13,12 @@ export default class Queue<T> {
         }
     }
 
-    get(): Promise<T> {
+    get(): Q.Promise<T> {
         if (this.items.length) {
-            return Promise.resolve(this.items.shift());
+            return Q.resolve(this.items.shift());
         }
         const d = Q.defer<T>();
         this.waitingList.push(d);
-        return d.promise as any;
+        return d.promise;
     }
 }
