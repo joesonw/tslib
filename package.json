@@ -26,7 +26,7 @@
     "reporter": [
       "html",
       "text",
-      "json"
+      "lcov"
     ],
     "instrument": true,
     "all": true  
