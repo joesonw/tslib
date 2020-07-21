@@ -24,7 +24,6 @@
       "**/*.d.ts"
     ],
     "reporter": [
-      "html",
       "text",
       "lcov"
     ],
