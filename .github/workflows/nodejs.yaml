@@ -1,0 +1,33 @@
+name: Nodejs 
+
+on: ["push", "pull_request"]
+
+jobs:
+  test:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '12'          
+
+      - run: yarn
+      - run: yarn lint
+      - run: yarn coverage
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  finish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}

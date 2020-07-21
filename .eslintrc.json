@@ -1,0 +1,26 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "extends": [
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "globals": {
+    "fetch": true
+  },
+  "rules": {
+    "semi": "error",
+    "indent": [
+      "error",
+      4,
+      {
+        "SwitchCase": 0
+      }
+    ],
+    "max-len": [
+      "error",
+      140
+    ]
+  }
+}

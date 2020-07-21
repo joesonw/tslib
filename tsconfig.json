@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist",
+        "target": "es6",
+        "module": "commonjs",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "noImplicitAny": true,
+        "skipLibCheck": true,
+        "jsx": "preserve",
+        "sourceMap": true,
+        "moduleResolution": "node",
+        "baseUrl": "./src",
+        "lib": [
+            "dom",
+            "es2018"
+        ],
+        "paths": {
+            "*": ["*"]
+        }
+    },
+    "compileOnSave": false,
+    "include": [
+        "./**/*.ts",
+        "./**/*.d.ts",
+        "./**/*.tsx"
+    ]
+}
