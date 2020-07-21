@@ -3,11 +3,13 @@
   "version": "0.1.0",
   "description": "",
   "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "lint": "eslint './src//**/*.ts?(x)'",
     "test": "mocha -r ts-node/register -r tsconfig-paths/register src/**/*.test.ts",
-    "coverage": "nyc yarn test"
+    "coverage": "nyc yarn test",
+    "prepublish": "yarn build"
   },
   "nyc": {
     "cache": false,
