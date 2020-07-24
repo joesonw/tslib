@@ -20,6 +20,7 @@ export default class Queue<T> {
                 queue,
                 cancel: null,
             };
+            this.subscriptions.push(sub);
 
             (async (sub: Subscription<T>) => {
                 while (true) {

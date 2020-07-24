@@ -45,8 +45,8 @@ describe('Queue', () => {
         const b = new Queue<string>();
         q.attach(a);
         q.attach(b);
-        setTimeout(() => a.add('123'), 300);
-        setTimeout(() => b.add('123'), 300);
+        setTimeout(() => a.add('123'), 100);
+        setTimeout(() => b.add('123'), 100);
         setTimeout(() => q.add('456'), 300);
         q.detach(a);
         q.detach(b);
