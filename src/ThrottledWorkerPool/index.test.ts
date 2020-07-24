@@ -42,7 +42,7 @@ describe('ThrottledWorkerPool', () => {
         p.add('2');
         p.add('3');
         p.start(2);
-        await sleep(210);
+        await sleep(230);
         expect(counter).eq(3);
         expect(errors).to.include.members(['1', '2', '3']);
     });
